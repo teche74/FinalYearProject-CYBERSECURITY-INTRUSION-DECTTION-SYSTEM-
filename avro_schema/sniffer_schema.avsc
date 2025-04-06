@@ -1,0 +1,264 @@
+{
+    "type": "record",
+    "name": "PacketAttributes",
+    "namespace": "com.example.packetsniffer",
+    "fields": [
+        {
+            "name": "id",
+            "type": "int"
+        },
+        {
+            "name": "dur",
+            "type": "double"
+        },
+        {
+            "name": "proto",
+            "type": "int"
+        },
+        {
+            "name": "service",
+            "type": "string"
+        },
+        {
+            "name": "state",
+            "type": "string"
+        },
+        {
+            "name": "spkts",
+            "type": "int"
+        },
+        {
+            "name": "dpkts",
+            "type": "int"
+        },
+        {
+            "name": "sbytes",
+            "type": "int"
+        },
+        {
+            "name": "dbytes",
+            "type": "int"
+        },
+        {
+            "name": "rate",
+            "type": "double"
+        },
+        {
+            "name": "sttl",
+            "type": "int"
+        },
+        {
+            "name": "dttl",
+            "type": "int"
+        },
+        {
+            "name": "sload",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "dload",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "sloss",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "dloss",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "sinpkt",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "dinpkt",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "sjit",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "djit",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "swin",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "stcpb",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "dtcpb",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "dwin",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "tcprtt",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "synack",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "ackdat",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "smean",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "dmean",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "trans_depth",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "response_body_len",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "ct_srv_src",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "ct_state_ttl",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "ct_dst_ltm",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "ct_src_dport_ltm",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "ct_dst_sport_ltm",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "ct_dst_src_ltm",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "is_ftp_login",
+            "type": "boolean"
+        },
+        {
+            "name": "ct_ftp_cmd",
+            "type": "int"
+        },
+        {
+            "name": "ct_flw_http_mthd",
+            "type": "int"
+        },
+        {
+            "name": "ct_src_ltm",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "ct_srv_dst",
+            "type": [
+                "null",
+                "int"
+            ]
+        },
+        {
+            "name": "is_sm_ips_ports",
+            "type": "string"
+        },
+        {
+            "name": "label",
+            "type": "string"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+$body = @{
+    is_attack = 1
+    message   = "Suspicious activity detected"
+    attack_cat  = "Not-Generic"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://127.0.0.1:5050/check-anomalies" `
+                  -Method Post `
+                  -Headers @{"Content-Type"="application/json"} `
+                  -Body $body

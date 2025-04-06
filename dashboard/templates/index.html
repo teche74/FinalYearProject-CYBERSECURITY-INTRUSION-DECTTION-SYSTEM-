@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDS Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Intrusion Detection System Dashboard</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <li><a href="{{ url_for('map') }}">Map</a></li>
+                    <li>
+                        <a href="{{ url_for('anomaly_alert') }}">
+                            Alert <span id="alert-badge" style="display: none; color: red;">⚠️</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section class="dashboard-section globe-dashboard">
+                <div id="canvas-globe-container"></div>
+            </section>
+
+            <section class="dashboard-section process-logs-dashboard">
+                <h2>Process Logs Analysis</h2>
+                <div class="dashboard">
+                    <!-- Table Section -->
+                    <div class="log-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Image Name</th>
+                                    <th>PID</th>
+                                    <th>Session Name</th>
+                                    <th>Session #</th>
+                                    <th>Memory Usage (MB)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                                <!-- Logs will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="charts">
+                        <div>
+                            <h3>Memory Usage</h3>
+                            <div id="bar-chart">{{ bar_chart | safe }}</div>
+                        </div>
+                    </div>
+
+                    <div class="charts">
+                        <div>
+                            <h3>Memory Distribution</h3>
+                            <div id="pie-chart">{{ pie_chart | safe }}</div>
+                        </div>
+
+                        <!-- <div>
+                            <h3>Memory Usage Trend Over Time</h3>
+                            <div id="line-chart">{{line_chart | safe}}</div>
+                        </div> -->
+
+                        <div>
+                            <h3>5 Most Memory-Intensive Processes</h3>
+                            <div id="bar-chart2">{{ bar_chart2 | safe }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="dashboard-section network-logs-dashboard">
+                <h2>Network Logs Analysis</h2>
+                <div class="dashboard">
+                    <div class="charts">
+                        <div>
+                            <h3>Active Connection Distribution</h3>
+                            <div id="protocol-pie-chart">{{ protocol_pie_chart | safe }}</div>
+                        </div>
+
+                        <div>
+                            <h3>Connection State Distribution</h3>
+                            <div id='network-bar-chart'>{{network_bar | safe}}</div>
+                        </div>
+                    </div>
+
+                    <div class="charts">
+                        <div>
+                            <h3>Top 10 Listening Ports</h3>
+                            <div id='listening-bar-chart'>{{listening_ports_bar_chart | safe}}</div>
+                        </div>
+
+                        <div>
+                            <h3>Local vs Foreign Address Distribution</h3>
+                            <div id='network-bar-chart2'>{{address_bar_chart | safe}}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section system-logs-dashboard">
+                <h2>Firewall Logs</h2>
+                <div class="dashboard">
+                    <div class="charts">
+                        <div>
+                            <h3>Traffic Over Time</h3>
+                            <div id='traffic-bar-chart'>{{traffic_over_time_chart | safe}}</div>
+                        </div>
+                        <div>
+                            <h3>Action Distribution (ALLOW vs DENY)</h3>
+                            <div id='action-dist-chart'>{{allow_deny_chart | safe}}</div>
+                        </div>
+                    </div>
+
+                    <div class="charts">
+                        <div>
+                            <h3>Top Source IPs</h3>
+                            <div id='top-src-ip-chart'>{{top_source_ips_chart | safe}}</div>
+                        </div>
+
+                        <div>
+                            <h3>Top Destination IPs</h3>
+                            <div id='top-dest-ip-chart'>{{top_dest_ips_chart | safe}}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section network-logs-dashboard">
+                <h2>Network Logs</h2>
+                <div class="dashboard">
+                    <h2>Real-Time Attack Map</h2>
+                    <div id="attackMap"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Intrusion Detection System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script>
+        function updateTable() {
+            fetch('/get_logs')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('logs-table-body');
+                    tbody.innerHTML = '';
+
+                    data.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${log['Image Name']}</td>
+                            <td>${log['PID']}</td>
+                            <td>${log['Session Name']}</td>
+                            <td>${log['Session#']}</td>
+                            <td>${log['Mem Usage']}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching logs:', error));
+        }
+
+        setInterval(updateTable, 5000);
+        window.onload = updateTable;
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function showLoader() {
+            document.querySelector('.loader').style.display = 'block';
+            setTimeout(() => {
+                document.querySelector('.loader').style.display = 'none';
+            }, 3000);
+        }
+
+        function updateCharts() {
+            fetch('/get_chart_data', { credentials: 'include' })
+                .then(response => {
+                    if (response.status === 401) {
+                        console.warn("Session expired, staying on dashboard");
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        console.error("No chart data available");
+                        return;
+                    }
+
+
+                    const neonColors = [
+                        'rgba(255, 99, 132, 0.8)',  // Neon Pink
+                        'rgba(54, 162, 235, 0.8)',  // Neon Blue
+                        'rgba(255, 206, 86, 0.8)',  // Neon Yellow
+                        'rgba(75, 192, 192, 0.8)',  // Cyan
+                        'rgba(153, 102, 255, 0.8)', // Neon Purple
+                        'rgba(255, 159, 64, 0.8)',  // Orange
+                        'rgba(233, 30, 99, 0.8)',   // Hot Pink
+                        'rgba(0, 255, 127, 0.8)'    // Neon Green
+                    ];
+
+                    const barColors = data.bar_chart.x.map((_, i) => neonColors[i % neonColors.length]);
+
+                    Plotly.react('bar-chart', [{
+                        x: data.bar_chart.x,
+                        y: data.bar_chart.y,
+                        type: 'bar',
+                        marker: { color: barColors } // ✅ No border, only solid colors
+                    }], {
+                        title: {
+                            text: '🚀 Memory Usage by Process',
+                            font: { color: '#ffffff', size: 20, family: 'Arial, sans-serif' }
+                        },
+                        xaxis: {
+                            title: { text: 'Process Name', font: { color: '#ffffff', size: 14 } },
+                            tickfont: { color: '#ffffff', size: 12 }
+                        },
+                        yaxis: {
+                            title: { text: 'Memory Usage (MB)', font: { color: '#ffffff', size: 14 } },
+                            tickfont: { color: '#ffffff', size: 12 }
+                        },
+                        margin: { t: 50, b: 50, l: 50, r: 50 },
+                        paper_bgcolor: 'transparent', // ✅ No background scaling
+                        plot_bgcolor: 'transparent',  // ✅ No highlighted backgrounds
+                        font: { color: '#ffffff' },
+                        template: 'plotly_dark' // Dark theme, but without extra scaling
+                    });
+
+
+                    // Update Pie Chart: Session & Process Memory Usage (Sunburst can be replaced with pie if needed)
+                    Plotly.react('pie-chart', [{
+                        labels: data.pie_chart.labels,
+                        values: data.pie_chart.values,
+                        type: 'pie'
+                    }], {
+                        title: 'Session & Process Memory Usage',
+                        margin: { t: 10, b: 10, l: 10, r: 10 },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)'
+                    });
+
+                    Plotly.react('bar-chart2', [{
+                        x: data.bar_chart2.x,
+                        y: data.bar_chart2.y,
+                        type: 'bar',
+                        marker: {
+                            color: data.bar_chart2.y, // Dynamic color based on memory usage
+                            colorscale: 'YlOrRd', // Yellow-Orange-Red gradient
+                            showscale: true // Display color scale
+                        },
+                        text: data.bar_chart2.y.map(value => value.toFixed(2) + ' MB'), // Show value on bars
+                        textposition: 'auto' // Automatically position text
+                    }], {
+                        title: {
+                            text: '🔥 Top Memory-Intensive Processes',
+                            font: { color: '#ffffff', size: 20, family: 'Arial, sans-serif' }
+                        },
+                        xaxis: {
+                            title: { text: 'Process Name', font: { color: '#ffffff', size: 14 } },
+                            tickangle: -25, // Less aggressive rotation for better readability
+                            tickfont: { color: '#ffffff', size: 12 },
+                            automargin: true, // Adjust margin dynamically
+                            tickmode: "array",
+                            tickvals: data.bar_chart2.x,
+                            ticktext: data.bar_chart2.x.map(name => name.length > 15 ? name.slice(0, 12) + "..." : name) // Shorten long names
+                        },
+                        yaxis: {
+                            title: { text: 'Memory Usage (MB)', font: { color: '#ffffff', size: 14 } },
+                            tickfont: { color: '#ffffff', size: 12 },
+                            gridcolor: 'rgba(255, 255, 255, 0.2)' // Subtle grid for better readability
+                        },
+                        margin: { t: 50, b: 120, l: 50, r: 50 }, // Adjusted bottom margin for rotated labels
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#ffffff' }
+                    });
+
+
+                    // Update Line Chart: Memory Usage over Time
+                    // Plotly.react('line-chart', [{
+                    //     x: data.line_chart.x,
+                    //     y: data.line_chart.y,
+                    //     type: 'scatter',
+                    //     mode: 'lines+markers',
+                    //     marker: { color: data.line_chart.color }
+                    // }], {
+                    //     title: 'Memory Usage over Time',
+                    //     xaxis: { title: 'Timestamp' },
+                    //     yaxis: { title: 'Memory Usage (MB)' },
+                    //     margin: { t: 10, b: 10, l: 10, r: 10 },
+                    //     paper_bgcolor: 'rgba(0,0,0,0)',
+                    //     plot_bgcolor: 'rgba(0,0,0,0)'
+                    // });
+
+                    // Update Protocol Pie Chart: Active Connections by Protocol
+                    Plotly.react('protocol-pie-chart', [{
+                        labels: data.protocol_pie_chart.labels,
+                        values: data.protocol_pie_chart.values,
+                        type: 'pie',
+                        hole: 0.3
+                    }], {
+                        title: 'Active Connections by Protocol',
+                        margin: { t: 10, b: 10, l: 10, r: 10 },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)'
+                    });
+
+                    Plotly.react('network-bar-chart', [{
+                        x: data.network_bar.x,
+                        y: data.network_bar.y,
+                        type: 'bar'
+                    }], {
+                        title: '📡 Network Connection States',
+                        xaxis: { title: 'Connection State' },
+                        yaxis: { title: 'Count' },
+                        margin: { t: 50, b: 50, l: 50, r: 50 },
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#ffffff' }
+                    });
+
+                    Plotly.react('listening-bar-chart', [{
+                        x: data.listening_ports_bar_chart.x,
+                        y: data.listening_ports_bar_chart.y,
+                        mode: 'markers+lines', // Combines dots and lines
+                        type: 'scatter',
+                        marker: {
+                            size: 10,
+                            color: ['#ff5733', '#33ff57', '#3383ff', '#ff33e6', '#ffdb33', '#8333ff', '#33fff9', '#f933ff', '#ff8c33', '#33ff8c']
+                        },
+                        line: { color: '#ffffff', width: 1, dash: 'dot' } // Dotted line for style
+                    }], {
+                        title: {
+                            text: '🔌 Top 10 Listening Ports',
+                            font: { color: '#ffffff', size: 18, family: 'Arial, sans-serif' }
+                        },
+                        xaxis: { title: 'Port Number', tickangle: -45 },
+                        yaxis: { title: 'Active Connections' },
+                        margin: { t: 50, b: 50, l: 50, r: 50 },
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#ffffff' }
+                    });
+
+
+
+                    Plotly.react('traffic-bar-chart', [{
+                        x: data.traffic_over_time_chart.x,
+                        y: data.traffic_over_time_chart.y,
+                        type: 'line'
+                    }], {
+                        title: '📊 Traffic Volume Over Time',
+                        xaxis: { title: 'Time' },
+                        yaxis: { title: 'Traffic Volume' },
+                        margin: { t: 50, b: 50, l: 50, r: 50 },
+                        paper_bgcolor: 'transparent',
+                        plot_bgcolor: 'transparent',
+                        font: { color: '#ffffff' }
+                    });
+
+                    // console.log(data.allow_deny_trend_chart)
+
+                    if (data.allow_deny_trend_chart.x.length > 0) {
+                        Plotly.react('action-dist-chart', [{
+                            type: "scatter",
+                            mode: "lines+markers",
+                            x: data.allow_deny_trend_chart.x,  // 📌 Time Intervals
+                            y: data.allow_deny_trend_chart.allow_values,
+                            name: "ALLOW 🚀",
+                            line: { color: "#2ecc71", width: 3 },
+                            marker: { symbol: "circle", size: 8 }
+                        }, {
+                            type: "scatter",
+                            mode: "lines+markers",
+                            x: data.allow_deny_trend_chart.x,
+                            y: data.allow_deny_trend_chart.deny_values.map(v => v + 1),  // Prevent "0" from disappearing
+                            name: "DENY 🔥",
+                            line: { color: "#e74c3c", width: 3 },
+                            marker: { symbol: "cross", size: 8 }
+                        }], {
+                            title: "📈 Allow vs Deny Requests Over Time",
+                            xaxis: { title: "Time", tickangle: -30 },
+                            yaxis: { title: "Number of Requests" },
+                            margin: { t: 50, b: 100, l: 50, r: 50 },
+                            paper_bgcolor: "transparent",
+                            plot_bgcolor: "transparent",
+                            font: { color: "#ffffff" }
+                        });
+                    } else {
+                        console.warn("No Allow vs Deny data available.");
+                    }
+
+
+
+                    const nodes = [];
+                    const links = [];
+
+                    // ✅ Create nodes for Local Addresses
+                    data.address_bar_chart.x.forEach((localAddress, index) => {
+                        nodes.push({
+                            id: localAddress,
+                            group: 1, // Local Group
+                            label: `[Local] ${localAddress}` // Prefix label for Local
+                        });
+                    });
+
+                    // ✅ Create nodes for Foreign Addresses
+                    data.address_bar_chart.color.forEach((foreignAddress, index) => {
+                        nodes.push({
+                            id: foreignAddress,
+                            group: 2, // Foreign Group
+                            label: `[Foreign] ${foreignAddress}` // Prefix label for Foreign
+                        });
+                    });
+
+                    // ✅ Create links (edges) between Local & Foreign Addresses
+                    data.address_bar_chart.x.forEach((localAddress, index) => {
+                        links.push({
+                            source: localAddress,
+                            target: data.address_bar_chart.color[index],
+                            value: data.address_bar_chart.y[index]
+                        });
+                    });
+
+                    // ✅ Use Plotly to generate the Force-Directed Graph
+                    Plotly.react('network-bar-chart2', [{
+                        type: "scatter",
+                        mode: "markers",  // ✅ Show only markers (no text by default)
+                        x: nodes.map(n => Math.random() * 100),
+                        y: nodes.map(n => Math.random() * 100),
+                        marker: {
+                            size: 12,
+                            color: nodes.map(n => n.group === 1 ? '#ff5733' : '#33ff57') // Local = Red, Foreign = Green
+                        },
+                        hovertext: nodes.map(n => n.label), // ✅ Show label only on hover
+                        hoverinfo: "text" // ✅ Display text only on hover
+                    }], {
+                        title: "🌍 Local vs Foreign Address Distribution",
+                        margin: { t: 50, b: 50, l: 50, r: 50 },
+                        paper_bgcolor: "transparent",
+                        plot_bgcolor: "transparent",
+                        font: { color: "#ffffff" }
+                    });
+
+                    Plotly.react('top-src-ip-chart', [{
+                        x: data.top_source_ips_chart.x,
+                        y: data.top_source_ips_chart.y,
+                        mode: 'markers',
+                        marker: {
+                            size: data.top_source_ips_chart.y.map(value => Math.sqrt(value) * 10), // Scale size dynamically
+                            color: data.top_source_ips_chart.y, // Gradient effect
+                            colorscale: 'Viridis', // Dark-to-light theme
+                            showscale: true // Show color scale
+                        },
+                        text: data.top_source_ips_chart.x.map(ip => `Source IP: ${ip}`), // Show IP on hover
+                        hoverinfo: 'text+y' // Show IP and value on hover
+                    }], {
+                        title: "🌍 Top Source IPs by Traffic Volume",
+                        xaxis: { title: "Source IPs", tickangle: -45 },
+                        yaxis: { title: "Traffic Volume (MB)" },
+                        margin: { t: 50, b: 100, l: 50, r: 50 },
+                        paper_bgcolor: "transparent",
+                        plot_bgcolor: "transparent",
+                        font: { color: "#ffffff" }
+                    });
+
+
+                    Plotly.react('top-dest-ip-chart', [{
+                        x: data.top_dest_ips_chart.x,
+                        y: data.top_dest_ips_chart.y,
+                        mode: 'markers',
+                        marker: {
+                            size: data.top_dest_ips_chart.y.map(value => Math.sqrt(value) * 10), // Scale size dynamically
+                            color: data.top_dest_ips_chart.y, // Gradient effect
+                            colorscale: 'Plasma', // Another vibrant color theme
+                            showscale: true // Show color scale
+                        },
+                        text: data.top_dest_ips_chart.x.map(ip => `Destination IP: ${ip}`),
+                        hoverinfo: 'text+y'
+                    }], {
+                        title: "🌎 Top Destination IPs by Traffic Volume",
+                        xaxis: { title: "Destination IPs", tickangle: -45 },
+                        yaxis: { title: "Traffic Volume (MB)" },
+                        margin: { t: 50, b: 100, l: 50, r: 50 },
+                        paper_bgcolor: "transparent",
+                        plot_bgcolor: "transparent",
+                        font: { color: "#ffffff" }
+                    });
+
+
+
+                })
+                .catch(error => console.error("Error fetching chart data:", error));
+        }
+
+        // Update charts every 10 seconds (adjust the interval as needed)
+        setInterval(updateCharts, 10000);
+
+        // Initial update on page load
+        updateCharts();
+        document.addEventListener("DOMContentLoaded", function () {
+            var map = L.map("attackMap", {
+                center: [20, 0],
+                zoom: 2,
+                minZoom: 2,
+                maxZoom: 10,
+                zoomControl: false,
+                worldCopyJump: true,
+            });
+
+            L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
+            }).addTo(map);
+
+            L.control.zoom({ position: "bottomright" }).addTo(map);
+
+            var attackMarkers = [];  // Store markers as an array (no unique key)
+            var markerCluster = L.markerClusterGroup();
+            map.addLayer(markerCluster);
+
+            var attackColors = {
+                "DoS": "red",
+                "Reconnaissance": "orange",
+                "Exploits": "blue",
+                "Worms": "purple",
+                "Backdoor": "yellow",
+                "Fuzzers": "pink",
+                "Generic": "white"
+            };
+
+            function fetchAttackData() {
+                fetch("http://127.0.0.1:5050/attacks")
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Fetched attack data:", data);
+                        updateMapWithAttacks(data);
+                    })
+                    .catch(error => console.error("Error fetching attack data:", error));
+            }
+
+            function updateMapWithAttacks(attacks) {
+                attacks.forEach(data => addMarker(data));
+            }
+
+            function addMarker(data) {
+                var attackType = data.attack_cat || "Unknown";
+                var markerColor = attackColors[attackType] || "gray";
+                var destinationIP = data.dst_ip;
+                var destinationPort = data.dst_port;
+                var sourceIP = data.src_ip;
+
+                var dstLocation = data.dst_location_info || {};
+                var dstLat = dstLocation.latitude ? parseFloat(dstLocation.latitude) : null;
+                var dstLon = dstLocation.longitude ? parseFloat(dstLocation.longitude) : null;
+
+                var srcLocation = data.src_location_info || {};
+                var srcLat = srcLocation.latitude ? parseFloat(srcLocation.latitude) : null;
+                var srcLon = srcLocation.longitude ? parseFloat(srcLocation.longitude) : null;
+
+                if (dstLat && dstLon) {
+                    // Apply slight random offset to prevent exact overlap
+                    dstLat += (Math.random() - 0.5) * 0.1;
+                    dstLon += (Math.random() - 0.5) * 0.1;
+
+                    var customIcon = L.divIcon({
+                        className: "custom-pulse-marker",
+                        html: `<div class="pulse" style="background:${markerColor};"></div>`,
+                        iconSize: [20, 20]
+                    });
+
+                    var marker = L.marker([dstLat, dstLon], { icon: customIcon }).addTo(markerCluster)
+                        .bindPopup(
+                            `<b>Source IP:</b> ${sourceIP}<br>
+                     <b>Destination IP:</b> ${destinationIP}<br>
+                     <b>Destination Port:</b> ${destinationPort}<br>
+                     <b>Attack Type:</b> ${attackType}<br>
+                     <b>Protocol:</b> ${data.protocol}<br>
+                     <b>Packet Size:</b> ${data.packet_size} bytes<br>
+                     <b>Source Port:</b> ${data.src_port} → <b>Dest Port:</b> ${destinationPort}`
+                        );
+
+                    attackMarkers.push(marker); // Store marker in array (no unique key)
+                }
+
+                // Add attack trail if source location is available
+                if (srcLat && srcLon && dstLat && dstLon) {
+                    addAttackTrail(srcLat, srcLon, dstLat, dstLon);
+                }
+            }
+
+            function addAttackTrail(srcLat, srcLon, dstLat, dstLon) {
+                var attackLine = L.polyline([[srcLat, srcLon], [dstLat, dstLon]], {
+                    color: "red",
+                    weight: 2,
+                    opacity: 0.7,
+                    dashArray: "5,10"
+                }).addTo(map);
+
+                setTimeout(() => {
+                    map.removeLayer(attackLine);
+                }, 5000);
+            }
+
+            fetchAttackData();
+            setInterval(fetchAttackData, 10000);
+        });
+
+
+
+
+
+    </script>
+    <script src="https://rawgit.com/jeromeetienne/threex.domevents/master/threex.domevents.js"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+
+</html>

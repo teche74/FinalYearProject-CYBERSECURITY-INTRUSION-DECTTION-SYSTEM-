@@ -1,0 +1,172 @@
+html {
+    background-color: #ffffff;
+}
+
+.container {
+    margin: 10px;
+    width: 100%;
+    margin: auto;
+    max-width: 100%;
+}
+
+@keyframes fadeUp {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #000000;
+    text-decoration: none;
+    padding: 10px 20px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+nav ul li a:hover {
+    background: #b3c8b3;
+    color: #000;
+    box-shadow: 0 0 15px #000000, 0 0 25px #000000;
+}
+
+
+.head1 {
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for a techy look */
+    font-size: 3rem;
+    font-weight: 700;
+    color: #000000; /* Cyan color for modern look */
+    text-align: center; /* Centers the text horizontally */
+    position: relative; /* Needed for animated effect */
+    letter-spacing: 1.5px;
+    animation: typing 4s steps(40) 1s forwards, glowing 1.5s ease-in-out infinite; /* Typing + glowing effect */
+}
+
+/* Typing effect */
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Glowing effect */
+@keyframes glowing {
+    0% {
+        text-shadow: 0 0 10px #3a3d3d, 0 0 20px #3a3d3d, 0 0 30px #3a3d3d, 0 0 40px #00FFFF;
+    }
+    50% {
+        text-shadow: 0 0 20px #3a3d3d, 0 0 30px #3a3d3d, 0 0 40px #3a3d3d, 0 0 50px #00FFFF;
+    }
+    100% {
+        text-shadow: 0 0 10px #3a3d3d, 0 0 20px #3a3d3d, 0 0 30px #3a3d3d, 0 0 40px #00FFFF;
+    }
+}
+
+/* Hover effect */
+.head1:hover {
+    color: #000000; /* Changes color to magenta on hover */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+
+
+#dashboard-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Title Styling */
+#dashboard-title {
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #00ffff;
+    text-shadow: 0 0 8px #00ffff, 0 0 16px rgba(0, 255, 255, 0.5);
+}
+
+/* Navigation Styling */
+#dashboard-nav {
+    margin-top: 20px;
+}
+
+/* Navigation List */
+#nav-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Navigation Links */
+#nav-list li {
+    display: inline-block;
+}
+
+#nav-list li a {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    font-size: 1.1rem;
+}
+
+/* Individual Link Colors */
+#nav-dashboard { color: #f8f8f8; }
+#nav-logout { color: #fdfdfd; }
+#nav-map { color: #ffffff; }
+#nav-alert { color: #ffffff; }
+
+/* Hover Effects */
+#nav-list li a::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    transition: width 0.3s ease, height 0.3s ease, left 0.3s ease, top 0.3s ease;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+#nav-list li a:hover::before {
+    width: 150%;
+    height: 150%;
+    left: -25%;
+    top: -25%;
+}
+
+#nav-list li a:hover {
+    text-shadow: 0 0 8px #ffffff;
+    transform: scale(1.1);
+}
+
+/* Active Click Effect */
+#nav-list li a:active {
+    transform: scale(0.95);
+}

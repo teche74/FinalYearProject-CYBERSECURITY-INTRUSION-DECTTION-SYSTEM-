@@ -1,0 +1,44 @@
+# 🔒 Secrets & credentials
+.env
+*.pfx
+*.crt
+*.jks
+*.key
+*.zip
+*.cfg
+*.json
+
+# 📦 Virtual environments and system libraries
+__pycache__/
+Include/
+Lib/
+pyvenv.cfg
+share/
+
+# 📊 Data files, logs, and outputs
+*.csv
+*.pcap
+*.log
+*.mmdb
+*.ndjson
+*.txt
+*.png
+*.svg
+
+# 💾 Ignore collected data and test datasets
+# DataCollection/data_collected/
+# DataCollection/scripts/*.pcap
+# DataCollection/*.png
+# DataCollection/sniffer_formula.txt
+# Cassandra_SCB/
+# IDS logging info/
+
+# 🧪 Compiled files and temporary files
+*.pyc
+*.pyo
+*.pyd
+
+# 🛠 VSCode and IDE settings (if any)
+.vscode/
+.idea/
+*.swp

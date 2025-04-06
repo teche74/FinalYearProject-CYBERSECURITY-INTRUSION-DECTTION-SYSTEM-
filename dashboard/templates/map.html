@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Anomaly Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Container for the map */
+        #map-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+        }
+
+        /* Footer container */
+        #footer-container {
+            height: 10vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 1.2em;
+        }
+
+        /* Status message styling */
+        #status {
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .status-healthy {
+            color: white;
+            background-color: green;
+            border: 2px solid darkgreen;
+        }
+
+        .status-warning {
+            color: white;
+            background-color: red;
+            border: 2px solid darkred;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
+</head>
+<body>
+    <div id="dashboard-container">
+        <header id="dashboard-header">
+            <h1 id="dashboard-title">Intrusion Detection System Dashboard</h1>
+            <nav id="dashboard-nav">
+                <ul id="nav-list">
+                    <li><a id="nav-dashboard" href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li><a id="nav-logout" href="{{ url_for('logout') }}">Logout</a></li>
+                    <li><a id="nav-map" href="{{ url_for('map') }}">Map</a></li>
+                    <li>
+                        <a href="{{ url_for('anomaly_alert') }}">
+                          Alert <span id="alert-badge" style="display: none; color: red;">⚠️</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+    </div>
+    
+    <!-- Map Container -->
+    <div id="map-container">
+        <div id="map" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <!-- Footer Notification Container -->
+    <div id="footer-container">
+        <div id="status" class="status-healthy">System is healthy. No anomalies detected.</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+
+            if (type === "healthy") {
+                statusDiv.classList.remove('status-warning');
+                statusDiv.classList.add('status-healthy');
+            } else if (type === "warning") {
+                statusDiv.classList.remove('status-healthy');
+                statusDiv.classList.add('status-warning');
+            }
+        }
+
+        function checkForAnomalies() {
+            fetch('/check-anomalies')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "anomaly_detected") {
+                        updateStatus("WARNING: Anomaly Detected!", "warning");
+                    } else {
+                        updateStatus("System is healthy. No anomalies detected.", "healthy");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error checking anomalies:", err);
+                    updateStatus("Error fetching system status.", "warning");
+                });
+        }
+
+        // Simulate checking anomalies every 5 seconds
+        setInterval(checkForAnomalies, 5000);
+    </script>
+    
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+</html>

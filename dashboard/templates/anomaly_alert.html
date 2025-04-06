@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDS Dashboard</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Three.js and GSAP for 3D & Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar">
+        <h2 class="sidebar-title">IDS Dashboard</h2>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('map') }}"><i class="fas fa-map"></i> Map View</a></li>
+                <li><a href="{{ url_for('anomaly_alert') }}"><i class="fas fa-exclamation-triangle"></i> Alerts</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- Header Section -->
+        <header id="top-header">
+            <h1>Intrusion Detection System</h1>
+            <span id="alert-badge" class="alert-icon safe">✅ Safe System</span>
+        </header>
+
+        <!-- Status Overview Cards -->
+        <section id="status-overview">
+            <div class="status-card secured">
+                <i class="fas fa-shield-alt"></i>
+                <h3>System Secured</h3>
+                <p>No threats detected</p>
+            </div>
+            <div class="status-card anomaly">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Anomaly Detected</h3>
+                <div id="alert-section">
+                    <h2>Critical Alerts: <span id="alert-count">0</span></h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Row -->
+        <section id="dashboard-main">
+
+            <!-- 3D Visualization Container
+        <div id="three-container">
+            <p>3D Visualization will appear here</p>
+        </div> -->
+
+            <!-- Anomaly Alert Section -->
+            <div id="recent-alerts">
+                <h3>Recent Alerts</h3>
+                <ul id="alert-list"></ul> <!-- Dynamic List -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <button id="chatbot-toggle">💬</button>
+    <div id="chatbot-container">
+        <div id="chat-header">Chatbot - Ask me about attacks</div>
+        <div id="chat-window"></div>
+        <div id="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Ask about an attack...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 IDS System. All Rights Reserved.</p>
+    </footer>
+
+    <!-- External Scripts -->
+    <script src="{{ url_for('static', filename='js/alert.js') }}"></script>
+
+</body>
+
+</html>
